@@ -1,3 +1,4 @@
+let ticks;
 let scene;
 let red;
 let red_x;
@@ -17,6 +18,7 @@ function setup() {
   createCanvas(800,800);
   background(0);
   frameRate(30);
+  ticks = 0;
   red = color(230, 0, 0);
   blue = color(4,143,224);
   red_size = 100;
@@ -35,8 +37,9 @@ function setup() {
 }
 
 function draw() {
-  print(scene);
-  print(red_size);
+  print("ticks: " + ticks);
+  print("frame: " + frameCount);
+  ticks++;
   if (scene == 1) {
     background(0);
     createClock();
@@ -44,7 +47,7 @@ function draw() {
     strokeWeight(1);
     fill(red);
     ellipse(red_x,red_y,red_size,red_size);
-    if (frameCount >= 300) {
+    if (ticks >= 300) {
       red_x += 20;
       red_y += 7;
     }
@@ -75,11 +78,14 @@ function draw() {
       }
     }
     if (red_x <= 210) {
+      for (let i = 0; i < s2_circles.length; i++){
+        (s2_circles[i]).turnRed = true;
+      }
       s2_back += 5;
       red_x += s2_back;
       s2_forward += 1;
     }
-    if(frameCount >= 750) {
+    if(ticks >= 750) {
       scene = 3;
     }
   }
@@ -101,10 +107,28 @@ function draw() {
       s3_red_diff_bg += 5;
     }
     if (s3_red_diff_bg >= 250) {
-      //scene = 1;
       background(0);
+      reset();
     }
   }
+}
+
+function reset() {
+  ticks = 0;
+  red_size = 100;
+  scene = 1;
+  red_x = 200;
+  red_y = 200;
+  // SCENE1 //////
+  s1_angle = -90;
+  // SCENE2 //////
+  s2_circles = [];
+  timeline_x = 0;
+  s2_back = 10;
+  s2_forward = 2.5;
+  // SCENE3 //////
+  s3_red_diff = 0;
+  s3_red_diff_bg = 0;
 }
 
 // SCENE1 ///////////////////////////////////////////
@@ -144,6 +168,8 @@ class Circle {
     this.y = random(50,750);
     this.opac = 255;
     this.size = random(50,150);
+    this.redVal = 4;
+    this.turnRed = false;
   }
   update() {
     this.opac -= 5;
@@ -158,10 +184,16 @@ class Circle {
     }
   }
   display() {
+    if (this.turnRed) {
+      this.redVal += 20;
+    }
     noStroke();
-    fill(4,143,224,this.opac);
+    fill(this.redVal,143,224,this.opac);
     ellipse(this.x,this.y,this.size,this.size);
   }
+  // turnRed() {
+  //   this.redVal += 10;
+  // }
 }
 function createTimeLine() {
   stroke(255);
